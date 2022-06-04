@@ -30,10 +30,11 @@ types:
         type: str
         encoding: ascii
         size: 2
-      - id: length
+      - id: u32_length
         type: u2
+        doc: Multiply this value by 4 to get the correct amount of bytes.
       - id: body
-        if: length != 0
+        if: u32_length != 0
         type:
           switch-on: marker
           cases:
@@ -61,7 +62,7 @@ types:
           AV -> Vorbis
           KI -> Keyframe Index
           PÆ -> ???
-          cc -> ???
+          cc -> Seemingly goes unused.
   video_metadata:
     seq:
       - id: width
@@ -113,13 +114,13 @@ types:
   audio_chunk_vorbis:
     seq:
       - id: header
-        size: 3554
+        size: (_parent.u32_length * 4)
   keyframe_index:
     seq:
       - id: keyframes
         type: keyframe
         repeat: expr
-        repeat-expr: (_parent.length * 4) / 8
+        repeat-expr: (_parent.u32_length * 4) / 8
   keyframe:
     seq:
       - id: chunk_offset
