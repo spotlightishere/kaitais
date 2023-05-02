@@ -4,3 +4,4 @@ They may or may not be of use to anyone beyond specific scenarios.
 
 Current contents:
  - Mobiclip video for the Nintendo Wii
+ - The macOS keychain format (`.keychain-db`)
