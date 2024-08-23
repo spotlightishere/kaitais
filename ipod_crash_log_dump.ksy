@@ -51,9 +51,8 @@ enums:
     0x61646472: fault_address
     # 'fapc', the PC of the faulting code.
     0x66617063: faulting_pc
-    # 'htsk', "halting task" possibly?
-    # This seems to correspond to the ID of the task faulting.
-    0x6874736b: htsk
+    # 'htsk', the ID of the task faulting/halting.
+    0x6874736b: halted_task
     # 'fasp', the previous stack pointer.
     0x66617370: fault_stack_pointer
     # 'fpsr', the register(?)
@@ -62,10 +61,11 @@ enums:
     0x65747970: exception_type
     # 'freg', the register contents at time of exception.
     0x66726567: fault_registers
-    # 'fsr '
-    0x66737220: fsr
+    # 'fsr ', two fault status registers.
+    # The first u4 is for data faults (DFSR), second is instruction (ISFR).
+    0x66737220: fault_status_registers
     # 'far '
-    0x66617220: far
+    0x66617220: fault_address_register
     # 'fstk'
     0x6673746b: fstk
     # 'stk2'
@@ -117,13 +117,21 @@ types:
             'section_types::faulting_pc': u4
             'section_types::fault_stack_pointer': u4
             'section_types::exception_type': u4
+            'section_types::halted_task': u4
             # Custom types.
             'section_types::package_id': package_id
             'section_types::tasks': tasks
             'section_types::fault_registers': register_state
+            'section_types::fault_status_registers': fault_statuses
             # TODO(spotlightishere): What are these?
-            'section_types::htsk': u4
             'section_types::fpsr': u4
+
+  fault_statuses:
+    seq:
+      - id: data_fault_status
+        type: u4
+      - id: instruction_fault_status
+        type: u4
 
   # Specifically at two offsets:
   # - 0x04: information about revision, stepping, etc.
@@ -162,12 +170,12 @@ types:
       - id: task_id
         type: u4
         doc: Incremental, though not sequential.
-      - id: xd
+      - id: unknown_value
         type: u4
       # Possibly flags?
-      - id: aaa
+      - id: flags_maybe
         type: u4
-      - id: adsffadsfds
+      - id: task_name
         type: strz
         size: 20
 
